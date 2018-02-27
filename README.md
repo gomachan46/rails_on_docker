@@ -1,0 +1,3 @@
+# rails_on_docker
+
+小さなRailsアプリをDockerでサクッと動かし始めるための叩き台を作る

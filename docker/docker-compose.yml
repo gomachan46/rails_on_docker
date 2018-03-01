@@ -49,5 +49,3 @@ volumes:
     driver: local
   tmp_cache:
     driver: local
-  myapp:
-    external: true

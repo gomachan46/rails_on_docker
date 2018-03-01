@@ -59,15 +59,15 @@ migrate:
 
 .PHONY: annotate
 annotate:
-	$(MAKE) run COMMAND="bundle exec annotate"
+	$(MAKE) run COMMAND="bundle exec annotate" || echo "annotate一旦スキップ"
 
 .PHONY: seed
 seed:
-	$(MAKE) run COMMAND="bundle exec rake db:seed_fu"
+	$(MAKE) run COMMAND="bundle exec rake db:seed_fu" || echo "seed_fu一旦スキップ"
 
 .PHONY: rubocop
 rubocop:
-	$(MAKE) run COMMAND="bundle exec rubocop"
+	$(MAKE) run COMMAND="bundle exec rubocop" || echo "rubocop一旦スキップ"
 
 # アプリのリポジトリをクローン
 .PHONY: clone/($APP_NAME)
@@ -92,7 +92,7 @@ app/restart:
 
 .PHONY: db/init
 db/init:
-	$(MAKE) run COMMAND="bundle exec rake db:drop db:create db:migrate db:seed_fu"
+	$(MAKE) run COMMAND="bundle exec rake db:drop db:create db:migrate" # db:seed_fu"
 	$(MAKE) annotate
 
 .PHONY: guard

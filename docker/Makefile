@@ -10,8 +10,8 @@ SRC_DIR = $(PWD)/myapp
 init:
 	$(MAKE) _clean
 	$(MAKE) _install
-	$(MAKE) up
-	$(MAKE) _bundler_waiter
+	$(DOCKER_COMPOSE_COMMAND) up -d --build
+	$(MAKE) _bundle
 	$(MAKE) db/init
 
 # bundlerやmigrateなどの更新反映
@@ -79,18 +79,16 @@ ps:
 .PHONY: _clean
 _clean:
 	rm -rf $(SRC_DIR)
+	$(DOCKER_COMPOSE_COMMAND) down -v
 
 .PHONY: _install
 _install:
 	-git clone -b $(APP_BRANCH) $(APP_REPOSITORY) $(SRC_DIR)
 
-.PHONY: _bundler_waiter
-_bundler_waiter:
-	$(MAKE) run COMMAND="/root/scripts/bundler_waiter.sh"
-
 .PHONY: _bundle
 _bundle:
 	$(MAKE) run COMMAND="bundle install"
+	$(MAKE) run COMMAND="/root/scripts/bundler_waiter.sh"
 
 .PHONY: _migrate
 _migrate:

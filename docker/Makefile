@@ -12,12 +12,12 @@ init: clone/myapp build up
 .PHONY: up
 up: docker/up
 
-.PHONY: server
-server:
-	$(DOCKER_COMPOSE_COMMAND) up app
-
 .PHONY: restart
 restart: down up
+
+.PHONY: ps
+ps:
+	$(DOCKER_COMPOSE_COMMAND) ps
 
 .PHONY: $(CONTAINER_COMMAND)
 $(CONTAINER_COMMAND):
@@ -36,6 +36,7 @@ db/logs:
 	$(DOCKER_COMPOSE_COMMAND) logs -f mysql
 
 .PHONY: run
+run: COMMAND = pwd
 run:
 	$(DOCKER_COMPOSE_COMMAND) exec spring bash -l -c "$(COMMAND)"
 

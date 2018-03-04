@@ -8,7 +8,6 @@ APP_BRANCH = master
 .PHONY: init
 init: clone/myapp build up
 	$(MAKE) run COMMAND="/root/scripts/create_db.sh"
-	$(MAKE) migrate seed
 
 .PHONY: up
 up: docker/up
@@ -55,22 +54,9 @@ rails/console:
 .PHONY: migrate
 migrate:
 	$(MAKE) run COMMAND="bundle exec rake db:migrate"
-	$(MAKE) annotate
-
-.PHONY: annotate
-annotate:
-	$(MAKE) run COMMAND="bundle exec annotate" || echo "annotate一旦スキップ"
-
-.PHONY: seed
-seed:
-	$(MAKE) run COMMAND="bundle exec rake db:seed_fu" || echo "seed_fu一旦スキップ"
-
-.PHONY: rubocop
-rubocop:
-	$(MAKE) run COMMAND="bundle exec rubocop" || echo "rubocop一旦スキップ"
 
 # アプリのリポジトリをクローン
-.PHONY: clone/($APP_NAME)
+.PHONY: clone/myapp
 clone/myapp:
 	-git clone -b $(APP_BRANCH) $(APP_REPOSITORY) $(SRC_DIR)
 
@@ -92,9 +78,4 @@ app/restart:
 
 .PHONY: db/init
 db/init:
-	$(MAKE) run COMMAND="bundle exec rake db:drop db:create db:migrate" # db:seed_fu"
-	$(MAKE) annotate
-
-.PHONY: guard
-guard:
-	$(MAKE) run COMMAND="bundle exec guard"
+	$(MAKE) run COMMAND="bundle exec rails db:drop db:create db:migrate"

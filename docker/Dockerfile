@@ -32,8 +32,8 @@ RUN echo '-T --skip-bundle' >> ~/.railsrc
 
 ENV CONFIGURE_OPTS --disable-install-rdoc
 ENV RUBY_CONFIGURE_OPTS --with-readline-dir=/usr/lib
-RUN rbenv install 2.4.1
-RUN rbenv global 2.4.1
+RUN rbenv install 2.5.0
+RUN rbenv global 2.5.0
 RUN /bin/bash -l -c 'gem install bundler'
 
 ENV APP_DIR_NAME myapp

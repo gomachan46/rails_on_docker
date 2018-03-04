@@ -1,9 +1,9 @@
 CONTAINER_COMMAND = start stop down build
 DOCKER_COMPOSE_COMMAND = docker-compose -p myapp
 DOCKER_COMMAND = docker
-APP_REPOSITORY = git@github.com:RailsApps/learn-rails.git
-SRC_DIR = $(PWD)/myapp
 APP_BRANCH = master
+APP_REPOSITORY = git@example.com:hoge/fuga
+SRC_DIR = $(PWD)/myapp
 
 # 一から作り直す
 .PHONY: init

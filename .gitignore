@@ -1,3 +1,5 @@
 /.idea
 /docker/myapp
 /docker/dotfiles/.bash_history
+/docker/dotfiles/.pry_history
+/docker/log

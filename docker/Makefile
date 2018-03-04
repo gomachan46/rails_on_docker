@@ -5,40 +5,32 @@ APP_REPOSITORY = git@github.com:RailsApps/learn-rails.git
 SRC_DIR = $(PWD)/myapp
 APP_BRANCH = master
 
+# 一から作り直す
 .PHONY: init
-init: clone/myapp build up
-	$(MAKE) run COMMAND="/root/scripts/create_db.sh"
+init:
+	$(MAKE) _clean
+	$(MAKE) _install
+	$(MAKE) up
+	$(MAKE) _bundler_waiter
+	$(MAKE) db/init
 
+# bundlerやmigrateなどの更新反映
 .PHONY: up
-up: docker/up
+up:
+	$(DOCKER_COMPOSE_COMMAND) up -d --build
+	$(MAKE) _bundle
+	$(MAKE) _migrate
 
-.PHONY: restart
-restart: down up
 
-.PHONY: ps
-ps:
-	$(DOCKER_COMPOSE_COMMAND) ps
+# 開発時に使うと良いかも系
 
-.PHONY: $(CONTAINER_COMMAND)
-$(CONTAINER_COMMAND):
-	$(DOCKER_COMPOSE_COMMAND) $@
-
-.PHONY: docker/up
-docker/up:
-	$(DOCKER_COMPOSE_COMMAND) up -d
-
-.PHONY: logs
-logs:
+.PHONY: logs/app
+logs/app:
 	$(DOCKER_COMPOSE_COMMAND) logs -f app
 
-.PHONY: db/logs
-db/logs:
+.PHONY: logs/db
+logs/db:
 	$(DOCKER_COMPOSE_COMMAND) logs -f mysql
-
-.PHONY: run
-run: COMMAND = pwd
-run:
-	$(DOCKER_COMPOSE_COMMAND) exec spring bash -l -c "$(COMMAND)"
 
 .PHONY: console
 console:
@@ -52,31 +44,58 @@ myapp/console:
 rails/console:
 	$(MAKE) run COMMAND="bundle exec rails console"
 
-.PHONY: migrate
-migrate:
-	$(MAKE) run COMMAND="bundle exec rake db:migrate"
-
-# アプリのリポジトリをクローン
-.PHONY: clone/myapp
-clone/myapp:
-	-git clone -b $(APP_BRANCH) $(APP_REPOSITORY) $(SRC_DIR)
-
 .PHONY: db/console
 db/console:
 	$(MAKE) run COMMAND="bundle exec rails db -p"
-
-.PHONY: bundle
-bundle:
-	$(MAKE) run COMMAND="bundle install"
 
 .PHONY: test
 test:
 	$(MAKE) run COMMAND="bin/rspec"
 
+# railsサーバ再起動
 .PHONY: app/restart
 app/restart:
 	$(MAKE) run COMMAND="bundle exec rails restart"
 
+# 任意のコマンドを実行
+.PHONY: run
+run: COMMAND = pwd
+run:
+	$(DOCKER_COMPOSE_COMMAND) exec spring bash -l -c "$(COMMAND)"
+
+# DBを一から作り直す
 .PHONY: db/init
 db/init:
 	$(MAKE) run COMMAND="bundle exec rails db:drop db:create db:migrate"
+
+# 立ち上がっているコンテナを確認
+.PHONY: ps
+ps:
+	$(DOCKER_COMPOSE_COMMAND) ps
+
+
+# 一般ユーザは実行しない系
+
+.PHONY: _clean
+_clean:
+	rm -rf $(SRC_DIR)
+
+.PHONY: _install
+_install:
+	-git clone -b $(APP_BRANCH) $(APP_REPOSITORY) $(SRC_DIR)
+
+.PHONY: _bundler_waiter
+_bundler_waiter:
+	$(MAKE) run COMMAND="/root/scripts/bundler_waiter.sh"
+
+.PHONY: _bundle
+_bundle:
+	$(MAKE) run COMMAND="bundle install"
+
+.PHONY: _migrate
+_migrate:
+	$(MAKE) run COMMAND="bundle exec rake db:migrate"
+
+.PHONY: $(CONTAINER_COMMAND)
+$(CONTAINER_COMMAND):
+	$(DOCKER_COMPOSE_COMMAND) $@

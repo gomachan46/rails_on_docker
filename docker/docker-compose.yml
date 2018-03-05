@@ -10,7 +10,7 @@ services:
       - ./log:/var/log/myapp
       - ./dotfiles:/root/dotfiles
     ports:
-      - "3000:3000"
+      - "3030:3000"
     tty: true
     stdin_open: true
     environment:
@@ -27,14 +27,14 @@ services:
     volumes:
       - mysql_db:/var/lib/mysql
     ports:
-      - "3306:3306"
+      - "33306:3306"
     environment:
       MYSQL_ROOT_PASSWORD: password
   redis:
     container_name: myapp_redis
     image: "redis"
     ports:
-      - "6379:6379"
+      - "16379:6379"
   spring:
     <<: *app_base
     container_name: myapp_spring
